@@ -11,7 +11,7 @@ import imaplib
 import smtplib
 import email
 
-import config
+import .config
 
 
 def _now():
