@@ -6,7 +6,7 @@ def readme(fname):
 
 setup(
     name = "ifttt",
-    version = "0.0.8",
+    version = "0.0.9",
     author = "Brian Abelson",
     author_email = "brian@newslynx.org",
     description = "A Pythonic interface for building IFTTT plugins routed over email.",

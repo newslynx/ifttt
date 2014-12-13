@@ -13,10 +13,15 @@ import email
 
 import config
 
+
 def _now():
-  dt = datetime.utcnow()
-  dt = t.replace(tzinfo=pytz.utc)
-  return int(dt.strftime('%s'))
+    """
+    Current UTC timestamp
+    """
+    dt = datetime.utcnow()
+    dt = t.replace(tzinfo=pytz.utc)
+    return int(dt.strftime('%s'))
+
 
 class IfThis:
 
@@ -47,7 +52,7 @@ class IfThis:
         self.username = kw.get('username', config.IFTTT_USERNAME)
         self.password = kw.get('password', config.IFTTT_PASSWORD)
         self.server = kw.get('server', config.IFTTT_IMAP_SERVER)
-        
+
         self.refresh = kw.get('refresh', 10)
         self.cache_size = kw.get('cache_size', 100)
         self.cache = []
@@ -65,17 +70,17 @@ class IfThis:
         """
 
         while True:
-            
-            # login and check inbox 
+
+            # login and check inbox
             self._login()
             for msg in self._check_inbox():
                 if msg and msg['id'] not in self.cache:
                     self._cache_control(msg)
                     self.main(msg)
 
-            time.sleep(self.refresh/2)
+            time.sleep(self.refresh / 2)
             self._logout()
-            time.sleep(self.refresh/2)
+            time.sleep(self.refresh / 2)
 
     def _login(self):
         self.client = imaplib.IMAP4_SSL(self.server)
@@ -92,7 +97,7 @@ class IfThis:
             return '(SUBJECT "{}")'.format(self.channel)
 
     def _check_inbox(self):
-        
+
         msgs = []
         result, data = self.client.search(None, self._query())
         ids = data[0]
@@ -106,43 +111,43 @@ class IfThis:
                     yield self._parse(raw)
 
         else:
-            yield None 
+            yield None
 
     def _parse(self, raw):
         """
         pre process raw message
         """
 
-        # clean the keys 
+        # clean the keys
         clean = {}
 
         msg = email.message_from_string(raw)
 
-        # get the content 
+        # get the content
         raw, body = self._parse_body(msg)
 
         # simplify
-        clean  = {}
+        clean = {}
         clean['id'] = msg['Message-Id'].replace('<', '').replace('>', '')
         clean['from'] = msg['from'].replace('<', '').replace('>', '')
         clean['to'] = msg['to'].strip()
         clean['subject'] = msg['subject'].strip()
         clean['body'] = body
         clean['timestamp'] = _now()
-        
+
         return clean
 
     def _parse_body(self, msg):
-        
+
         # get the msg
         parts = msg.get_payload()
         msg = parts[-1]
         raw = msg.get_payload().strip()
 
         if isinstance(self.pattern, dict):
-            
+
             body = json.loads(raw)
-            
+
             for k in self.pattern.keys():
                 if k not in body:
                     raise ValueError('Body missing required key {}'.format(k))
@@ -157,46 +162,49 @@ class IfThis:
 
         else:
 
-            raise NotImplementedError('IfThis requires a pattern (regex / schemamap)')
+            raise NotImplementedError(
+                'IfThis requires a pattern (regex / schemamap)')
 
-        
         return raw, body
 
     def _cache_control(self, msg):
         self.cache.append(msg['id'])
         if len(list(self.cache)) > self.cache_size:
-            self.cache = self.cache[-(self.cache_size-1)]
+            self.cache = self.cache[-(self.cache_size - 1)]
 
 
 def ifthis(channel, **dkwargs):
-  """
-  listen to custom source and emit messages 
-  to an email inbox with a custom channel as the subject 
-  """
-  # wrapper
-  def wrapper(f):
+    """
+    listen to custom source and emit messages 
+    to an email inbox with a custom channel as the subject 
+    """
+    # wrapper
+    def wrapper(f):
 
-    @wraps(f)
-    def wrapped_func(*args, **kw):
-        
-        class _T(IfThis):
-            def __init__(self):
-                IfThis.__init__(self, channel, **dkwargs)
-            
-            def main(self, message):
-                f(message)
+        @wraps(f)
+        def wrapped_func(*args, **kw):
 
-        return _T().run()
+            class _T(IfThis):
 
-    return wrapped_func
+                def __init__(self):
+                    IfThis.__init__(self, channel, **dkwargs)
 
-  return wrapper
+                def main(self, message):
+                    f(message)
+
+            return _T().run()
+
+        return wrapped_func
+
+    return wrapper
 
 
 class ThenThat:
+
     """
     Route messages back into IFTTT via email
     """
+
     def __init__(self, channel, **kw):
 
         self.channel = channel
@@ -206,7 +214,6 @@ class ThenThat:
         self.server = kw.get('server', config.IFTTT_SMTP_SERVER)
         self.port = kw.get('port', config.IFTTT_SMTP_PORT)
         self.refresh = kw.get('refresh', 10)
-
 
     def main(self):
         """
@@ -246,7 +253,7 @@ class ThenThat:
         Send a message
         """
         msg = self._format_msg(msg)
-        self.client.sendmail(self.username, self.to,msg)
+        self.client.sendmail(self.username, self.to, msg)
 
     def _format_msg(self, body):
         """
@@ -258,48 +265,44 @@ class ThenThat:
         msg['Subject'] = self.channel
         msg['From'] = self.to
         msg['To'] = self.to
-        
+
         # add timestamp / serialize
         body['timestamp'] = _now()
         msg_string = json.dumps(body)
-        
+
         # build up message body
         body = MIMEMultipart('alternative')
         part1 = MIMEText(msg_string, 'plain')
-        part2 = MIMEText(msg_string , 'html')
+        part2 = MIMEText(msg_string, 'html')
         body.attach(part1)
         body.attach(part2)
-        msg.attach(body)  
+        msg.attach(body)
 
-        # convert to string  
+        # convert to string
         return msg.as_string()
 
 
 def thenthat(channel, **dkwargs):
-  """
-  listen to an email subject and emit messages 
-  to a callback 
-  """
-  # wrapper
-  def wrapper(f):
+    """
+    listen to an email subject and emit messages 
+    to a callback 
+    """
+    # wrapper
+    def wrapper(f):
 
-    @wraps(f)
-    def wrapped_func(*args, **kw):
-        
-        class _T(ThenThat):
-            
-            def __init__(self):
-                ThenThat.__init__(self, channel, **dkwargs)
-            
-            def main(self):
-                f()
+        @wraps(f)
+        def wrapped_func(*args, **kw):
 
-        return _T().run()
+            class _T(ThenThat):
 
-    return wrapped_func
+                def __init__(self):
+                    ThenThat.__init__(self, channel, **dkwargs)
 
-  return wrapper
+                def main(self):
+                    f()
 
+            return _T().run()
 
+        return wrapped_func
 
-
+    return wrapper
