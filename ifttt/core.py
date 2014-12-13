@@ -19,7 +19,7 @@ def _now():
     Current UTC timestamp
     """
     dt = datetime.utcnow()
-    dt = t.replace(tzinfo=pytz.utc)
+    dt = dt.replace(tzinfo=pytz.utc)
     return int(dt.strftime('%s'))
 
 
