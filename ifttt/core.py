@@ -1,15 +1,22 @@
+import re
+import time
+from functools import wraps
+import json
+from datetime import datetime
+import pytz
+
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 import imaplib
 import smtplib
 import email
-import re
-import time
-from functools import wraps
-import json
 
 import config
-import util
+
+def _now():
+  dt = datetime.utcnow()
+  dt = t.replace(tzinfo=pytz.utc)
+  return int(dt.strftime('%s'))
 
 class IfThis:
 
@@ -121,6 +128,7 @@ class IfThis:
         clean['to'] = msg['to'].strip()
         clean['subject'] = msg['subject'].strip()
         clean['body'] = body
+        clean['timestamp'] = _now()
         
         return clean
 
@@ -252,7 +260,7 @@ class ThenThat:
         msg['To'] = self.to
         
         # add timestamp / serialize
-        body['timestamp'] = util.now()
+        body['timestamp'] = _now()
         msg_string = json.dumps(body)
         
         # build up message body
@@ -291,11 +299,6 @@ def thenthat(channel, **dkwargs):
     return wrapped_func
 
   return wrapper
-
-def now():
-  dt = datetime.utcnow()
-  dt = t.replace(tzinfo=pytz.utc)
-  return int(dt.strftime('%s'))
 
 
 
