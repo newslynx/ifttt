@@ -12,7 +12,7 @@ By creating a set of transformations for routing IFTTT channels to email,
 we can pass structured data to custom email-listener functions – `ifthat`
 which can be routed to an arbitrary `thenthis` function that a user defines.
 
-## installation / dependencies 
+## installation
 
 ```
 pip install ifttt
@@ -22,7 +22,12 @@ Our implementation is written and native python 2.7 and has no dependencies.
 
 ## examples
 
-###  If That Then Say Tweet ... 
+###  If That Then Say Tweet ...
+
+Make a Twitter Recipe that has these email parameters (customize the address to your liking)
+
+![](https://www.dropbox.com/s/1kjtrkyrdjobrtg/Screenshot%202014-12-14%2000.03.39.png) 
+[link](https://ifttt.com/recipes/229283-if-twitter-then-data)
 
 ```python 
 from ifttt import ifthat
