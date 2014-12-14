@@ -97,12 +97,13 @@ class IfThat:
 
         self.username = kw.get('username', config.IFTTT_USERNAME)
         self.password = kw.get('password', config.IFTTT_PASSWORD)
-        self.server = kw.get('server', config.IFTTT_IMAP_SERVER)
-        self.port = kw.get('port', config.IFTTT_IMAP_PORT)
-        self.refresh = kw.get('refresh', 10)
+        self.server = kw.get('server', config.IFTTT_SERVER)
+        self.port = kw.get('port', config.IFTTT_PORT)
+        self.refresh = kw.get('refresh', 120)
         self.cache_size = kw.get('cache_size', 100)
+        self.pool = Pool(kw.get('num_workers', 5))
         self.cache = []
-        self.pool = Pool(kw.get('num_workers', 10))
+        
 
     def thenthis(self, msg):
         """
@@ -234,7 +235,7 @@ class IfThat:
         if isinstance(self.regex, re._pattern_type):
             m = self.regex.search(raw)
             if not m:
-                raise ValueError('bad regex!')
+                raise ValueError('Bad regex!')
             body = m.groupdict()
             self._check_required(body)
             return body
