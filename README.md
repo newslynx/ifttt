@@ -76,7 +76,20 @@ for msg in yo():
 
 This basic approach works for every channel!
 
-## Input Format
+## Schema
+
+### Body PatternFormat
+
+All email bodies (the "pattern") should be format as follows:
+
+```
+pattern = "{{IFTTT_INGREDIENT_1}}||||{{IFTTT_INGREDIENT_2}}||||"
+```
+
+This pattern ensures that new channels can be configured simply 
+by separating all of its ingredients with 5 pipes (`||||`).
+
+### Messsage
 
 All email messages routed to `thenthis` steps 
 are processed to have the following 
