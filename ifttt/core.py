@@ -127,9 +127,8 @@ class IfThat:
             """
             Check cache on runtime
             """
-            if msg and msg['id'] not in self.cache:
+            if msg and msg['id'] not in self._cache:
                 self._update_cache(msg)
-
                 # yield message
                 return self.thenthis(msg)
 
