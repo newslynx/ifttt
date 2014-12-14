@@ -2,9 +2,20 @@ from core import IfThat
 
 def ifthat(subject, **dkwargs):
     """
-    a decorator for
-    listen to an email subject and emit messages 
-    to a callback via decorator
+    a decorator to modi listen to an email subject and endlessly emit messages 
+    to the custom function.
+
+        from ifttt import ifthat
+
+        @ifthat('twitter', pattern = "{{UserName}}|||||{{LinkToTweet}}|||||{{Text}}|||||")
+        def twitter(msg):
+            import os 
+            os.system('tweet from {text}'.format(**msg['body']))
+            return msg
+
+        for msg in twitter():
+            print msg
+
     """
     # wrapper
     def wrapper(f):
