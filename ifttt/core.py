@@ -59,15 +59,17 @@ def linter(pattern, delim=config.IFTTT_DELIM):
         {{CreatedAt}}|||||
         {{EmbedCode}}|||||
 
-    And format it something like this:
+    And format into a tuple of (regex, required_keys),
+    something like this:
 
         (   
-            # regex
+            # regex (will be pre-compiled!)
             '^(?P<url>.+)\\|\\|\\|\\|\\|(?P<source_url>.+)\\|\\|\\|\\|\\|(?P<caption>.+)\\|\\|\\|\\|\\|(?P<created_at>.+)\\|\\|\\|\\|\\|(?P<embed_code>.+)\\|\\|\\|\\|\\|$', 
             
             # required keys
             ['url', 'source_url', 'caption', 'created_at', 'embed_code'], 
-        }
+        )
+
     """
     #clean whitespace
     pattern = re.sub('\s+', '', pattern)
