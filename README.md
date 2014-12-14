@@ -24,7 +24,8 @@ Our implementation is written and native python 2.7 and has no dependencies.
 
 ###  If That Then Say Tweet ...
 
-Make a Twitter Recipe that has these email parameters (customize the address to your liking)
+Make an "IfThis" Twitter Recipe that has an "ThenThat" 
+mail step (customize the address to match your configuration)
 
 [![](examples/twitter.png)](https://ifttt.com/recipes/229283-if-twitter-then-data)
 
@@ -35,18 +36,20 @@ from ifttt import ifthat
 def twitter(msg):
 	import os 
 	os.system('tweet from {text}'.format(**msg['body']))
-
+	return msg
+	
 for msg in twitter():
 	print msg
 ```
 
 ### If This Then Say YO
 
-```python
-from ifttt import ifthat
-
+Make an "IfThis" Yo Recipe that has an "ThenThat" 
+mail step (customize the address to match your configuration)
 [![](examples/yo.png)](https://ifttt.com/recipes/229285-if-yo-then-data)
 
+```python
+from ifttt import ifthat
 
 @ifthat('yo', pattern="{{ReceivedAt}}|||||{{From}}|||||")
 def then_yo(msg):
