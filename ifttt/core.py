@@ -72,6 +72,9 @@ def linter(pattern, delim=config.IFTTT_DELIM):
         )
 
     """
+    if not pattern:
+        return None, None, []
+
     #clean whitespace
     pattern = re.sub('\s+', '', pattern)
 
@@ -94,7 +97,7 @@ class IfThat:
 
         # lint pattern.
         self.pattern, self.regex, self.requires = \
-            linter(kw.get('pattern'))
+            linter(kw.get('pattern', None))
 
         self.username = kw.get('username', config.IFTTT_USERNAME)
         self.password = kw.get('password', config.IFTTT_PASSWORD)
@@ -233,16 +236,20 @@ class IfThat:
         msg = parts[-1]
         raw = msg.get_payload().strip()
 
-        if isinstance(self.regex, re._pattern_type):
-            m = self.regex.search(raw)
-            if not m:
-                raise ValueError('Bad regex!')
-            body = m.groupdict()
-            self._check_required(body)
-            return body
+        if self.regex:
+            if isinstance(self.regex, re._pattern_type):
+                m = self.regex.search(raw)
+                if not m:
+                    raise ValueError('Bad regex!')
+                body = m.groupdict()
+                self._check_required(body)
+                return body
+
+            else:
+                raise ValueError('Regex failed to compile!')
 
         else:
-            raise NotImplementedError('Regex must be compiled!')
+            return {'raw':raw}
 
     def _update_cache(self, msg):
         """

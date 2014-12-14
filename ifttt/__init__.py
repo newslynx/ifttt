@@ -1,4 +1,4 @@
-from core import IfThat
+from core import IfThat, linter 
 
 def ifthat(subject, **dkwargs):
     """

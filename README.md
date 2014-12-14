@@ -2,7 +2,7 @@
 `ifttt` is a simple package for connecting [IFTTT](http://ifttt.com) 
 channels with your service via email.
 
-## what?
+## What?
 
 [IFTTT](http://ifttt.com) provides an interface to an amazing number of services, but since they
 lack their own API and have a closed submission process, it's difficult to integrate it into
@@ -92,8 +92,7 @@ by separating all of its ingredients with 5 pipes (`||||`).
 ### Messsage
 
 All email messages routed to `thenthis` steps 
-are processed to have the following 
-format (a simple python dictionary):
+are processed to have the following format (a simple python dictionary):
 
 ```python
 {
@@ -105,6 +104,21 @@ format (a simple python dictionary):
     'body': {                    # parsed body (as specified by `pattern`)
         'received_at': 'December 13, 2014 at 11:45PM', 
         'from': 'ABELSONLIVE'
+    }
+}
+```
+
+If no `pattern` is specified, the format will be as follows:
+
+```python
+{
+    'id': '548d15ea3c46c_119282d32c497a2@ip-10-180-52-134.mail', 
+    'subject': 'yo',
+    'from': 'gmail@example.com', 
+    'to': 'brian@newslynx.org',  
+    'timestamp': 1418553603,     # utc timestamp when message was processed
+    'body': {                    # raw contents of email.
+        'raw': 'December 13, 2014 at 11:45PM|||||ABELSONLIVE|||||' 
     }
 }
 ```
