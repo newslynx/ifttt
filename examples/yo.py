@@ -1,19 +1,16 @@
-from ifttt import ifthis
-from ifttt import util
+from ifttt import ifthat
 
-
-pattern ={
-	"published": "{{ReceivedAt}}",
-	"from": "{{From}}" 
-}
-
-@ifthis('yo', pattern=pattern)
+@ifthat('yo', pattern="{{ReceivedAt}}|||||{{From}}|||||")
 def yo(msg):
-	import os 
+	import os
+	os.system('say yo from {from} &'.format(**msg['body']))
+	return msg 
+	
+for msg in yo():
 	print msg
-	os.system('say "YO FROM {from}"'.format(**msg['body']))
 
 if __name__ == '__main__':
-	yo()
+	for msg in yo(): pass
+		
 
 

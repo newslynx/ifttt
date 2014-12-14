@@ -1,20 +1,12 @@
-from ifttt import ifthis
+from ifttt import ifthat
 
-pattern = pattern = { 
-	"user_name": "{{UserName}}", 
-	"published": "{{CreatedAt}}", 
-	"short_url": "{{LinkToTweet}}",
-	"text": "{{Text}}"
-}
-
-@ifthis('twitter', pattern=pattern)
+@ifthat('twitter', pattern = "{{UserName}}|||||{{LinkToTweet}}|||||{{Text}}|||||")
 def twitter(msg):
 	import os 
-	print msg
-	os.system('say {text}'.format(**msg['body']))
-
+	os.system('tweet from {text}'.format(**msg['body']))
 
 if __name__ == '__main__':
-	twitter()
+	for msg in twitter():
+		print msg
 
 

@@ -1,5 +1,6 @@
-# ifttt
-helpers for connecting [IFTTT](http://ifttt.com) with any other service via `email`
+# ifttt (If That Then This)
+`ifttt` is a simple package for connecting [IFTTT](http://ifttt.com) 
+channels with your service via and email inbox.
 
 ## what?
 
@@ -8,7 +9,8 @@ lack their own API and have a closed submission process, it's difficult to integ
 your applications.  
 
 By creating a set of transformations for routing IFTTT channels to email,
-we can pass structured data to custom callback functions – `ifthis` – or listen to other services and send emails which can be processed by IFTTT - `thenthat`.
+we can pass structured data to custom email-listener functions – `ifthat`
+which can be routed to an arbitrary `thenthis` function that a user defines.
 
 ## installation / dependencies 
 
@@ -20,41 +22,36 @@ Our implementation is written and native python 2.7 and has no dependencies.
 
 ## examples
 
-###  If This ... 
+###  If That Then Say Tweet ... 
 
 ```python 
-from ifttt import ifthis
+from ifttt import ifthat
 
-pattern = pattern = { 
-	"user_name": "{{UserName}}", 
-	"published": "{{CreatedAt}}", 
-	"short_url": "{{LinkToTweet}}",
-	"text": "{{Text}}"
-}
-
-@ifthis('twitter', pattern=pattern)
+@ifthat('twitter', pattern = "{{UserName}}|||||{{LinkToTweet}}|||||{{Text}}|||||")
 def twitter(msg):
-	import os
+	import os 
+	os.system('tweet from {text}'.format(**msg['body']))
+
+for msg in twitter():
 	print msg
-	os.system('say {text}'.format(**msg['body']))
-
-
-# when we run this script it will listen indefinitely for new messages
-# on this routing key
-if __name__=="__main__":
-	twitter()
-
 ```
 
-### Channels  (In Progress!, Please Contributes)
+### If This Then Say YO
+
 ```python
-from ifttt import channels
-from pprint import pprint
+from ifttt import ifthat
 
-pprint(channels) ## a simple hash of channel => pattern
+@ifthat('yo', pattern="{{ReceivedAt}}|||||{{From}}|||||")
+def then_yo(msg):
+	import os
+	os.system('say yo from {from} &'.format(**msg['body']))
+	return msg 
+	
+for msg in yo():
+	print msg
 ```
 
-### configuration
+## Configuration
 
 export these environmental variables:
 
@@ -63,11 +60,7 @@ export IFTTT_USERNAME='username@domain.com'
 export IFTTT_PASSWORD='password'
 export IFTTT_IMAP_SERVER='mail.domain.com'
 export IFTTT_IMAP_PORT=993
-export IFTTT_SMTP_SERVER='mail.domain.com'
-export IFTTT_SMTP_PORT=587
 ```
 
 ## TODO
-- [ ] Delete Messages 
-- [ ] Create [comprehensive libraries of channels](ifttt/lib.py)
-- [ ] Persistent caching so duplicates arent emitted.
+- [ ] Delete Messages
