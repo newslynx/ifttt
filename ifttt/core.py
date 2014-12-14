@@ -17,6 +17,7 @@ from functools import wraps
 import json
 from datetime import datetime
 import pytz
+import random
 
 # email imports
 from email.MIMEText import MIMEText
@@ -64,7 +65,7 @@ def linter(pattern, delim=config.IFTTT_DELIM):
 
         (   
             # regex (will be pre-compiled!)
-            '^(?P<url>.+)\\|\\|\\|\\|\\|(?P<source_url>.+)\\|\\|\\|\\|\\|(?P<caption>.+)\\|\\|\\|\\|\\|(?P<created_at>.+)\\|\\|\\|\\|\\|(?P<embed_code>.+)\\|\\|\\|\\|\\|$', 
+            r'^(?P<url>.+)\|\|\|\|\|(?P<source_url>.+)\|\|\|\|\|(?P<caption>.+)\|\|\|\|\|(?P<created_at>.+)\|\|\|\|\|(?P<embed_code>.+)\|\|\|\|\|$', 
             
             # required keys
             ['url', 'source_url', 'caption', 'created_at', 'embed_code'], 
@@ -100,6 +101,7 @@ class IfThat:
         self.server = kw.get('server', config.IFTTT_SERVER)
         self.port = kw.get('port', config.IFTTT_PORT)
         self.refresh = kw.get('refresh', 120)
+        self.random_factor = kw.get('random_factor', 0.2)
         self.cache_size = kw.get('cache_size', 100)
         self.pool = Pool(kw.get('num_workers', 5))
         self.cache = []
@@ -140,10 +142,10 @@ class IfThat:
                 if msg:
                     yield msg
 
-            # pause, login, pause, iterate (blocking!)
-            time.sleep(self.refresh / 2)
+            # pause, login, pause with noise, iterate (blocking!)
+            time.sleep(self.refresh * self._noise() / 2)
             self._logout()
-            time.sleep(self.refresh / 2)
+            time.sleep(self.refresh * self._noise() / 2)
 
     def _login(self):
         """
@@ -241,7 +243,7 @@ class IfThat:
             return body
 
         else:
-            raise NotImplementedError('regex must be compiled!')
+            raise NotImplementedError('Regex must be compiled!')
 
     def _update_cache(self, msg):
         """
@@ -258,5 +260,12 @@ class IfThat:
         dt = datetime.utcnow()
         dt = dt.replace(tzinfo=pytz.utc)
         return int(dt.strftime('%s'))
+
+    def _noise(self):
+        """
+        Some random noise in sleep intervals
+        """
+        f = int(10.0 * self.random_factor)
+        return random.choice([x/100. for x in range(100-f, 100+f, 1)])
 
 
