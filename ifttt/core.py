@@ -101,10 +101,10 @@ class IfThat:
         self.server = kw.get('server', config.IFTTT_SERVER)
         self.port = kw.get('port', config.IFTTT_PORT)
         self.refresh = kw.get('refresh', 120)
-        self.random_factor = kw.get('random_factor', 0.2)
+        self.noise = kw.get('noise', 0.2)
         self.cache_size = kw.get('cache_size', 100)
-        self.pool = Pool(kw.get('num_workers', 5))
-        self.cache = []
+        self._pool = Pool(kw.get('num_workers', 5))
+        self._cache = []
         
 
     def thenthis(self, msg):
@@ -138,7 +138,7 @@ class IfThat:
 
             # login and check inbox, yield new messages
             self._login()
-            for msg in self.pool.imap_unordered(_thenthis, self._check_inbox()):
+            for msg in self._pool.imap_unordered(_thenthis, self._check_inbox()):
                 if msg:
                     yield msg
 
@@ -249,9 +249,9 @@ class IfThat:
         """
         Update the in-memory cache.
         """
-        self.cache.append(msg['id'])
-        if len(list(self.cache)) > self.cache_size:
-            self.cache = self.cache[-(self.cache_size - 1)]
+        self._cache.append(msg['id'])
+        if len(list(self._cache)) > self.cache_size:
+            self._cache = self._cache[-(self.cache_size - 1)]
 
     def _now(self):
         """
@@ -265,7 +265,7 @@ class IfThat:
         """
         Some random noise in sleep intervals
         """
-        f = int(10.0 * self.random_factor)
-        return random.choice([x/100. for x in range(100-f, 100+f, 1)])
+        n = int(10.0 * self.noise)
+        return random.choice([x/100. for x in range(100-n, 100+n, 1)])
 
 
