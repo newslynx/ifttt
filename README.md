@@ -1,16 +1,16 @@
 # ifttt (If That Then This)
 `ifttt` is a simple package for connecting [IFTTT](http://ifttt.com) 
-channels with your service via and email inbox.
+channels with your service via email.
 
 ## what?
 
 [IFTTT](http://ifttt.com) provides an interface to an amazing number of services, but since they
 lack their own API and have a closed submission process, it's difficult to integrate it into
-your applications.  
+your own applications.  
 
 By creating a set of transformations for routing IFTTT channels to email,
 we can pass structured data to custom email-listener functions – `ifthat`
-which can be routed to an arbitrary `thenthis` function that a user defines.
+which can be routed to an arbitrary `thenthis` callback function.
 
 ## installation
 
@@ -88,7 +88,7 @@ config = {
 	refresh=120 # how often to refresh the inbox
 }
 @ifthat(**config)
-def then_yo(msg):
+def yo(msg):
 	import os
 	os.system('say yo from {from} &'.format(**msg['body']))
 	return msg 
