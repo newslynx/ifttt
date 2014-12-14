@@ -102,7 +102,7 @@ format (a simple python dictionary):
     'from': 'gmail@example.com', 
     'to': 'brian@newslynx.org',  
     'timestamp': 1418553603,     # utc timestamp when message was processed
-    'body': {                    # parsed body
+    'body': {                    # parsed body (as specified by `pattern`)
         'received_at': 'December 13, 2014 at 11:45PM', 
         'from': 'ABELSONLIVE'
     }
