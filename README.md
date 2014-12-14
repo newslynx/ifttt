@@ -83,7 +83,7 @@ This basic approach works for every channel!
 All email bodies (the "pattern") should be format as follows:
 
 ```python
-pattern = "{{IFTTT_INGREDIENT_1}}||||{{IFTTT_INGREDIENT_2}}||||"
+pattern = "{{Ingredient1}}||||{{Ingredient2}}||||"
 ```
 
 This pattern ensures that new channels can be configured simply 
