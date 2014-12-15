@@ -271,7 +271,8 @@ class IfThat:
         """
         Some random noise in sleep intervals
         """
-        n = int(10.0 * self.noise)
-        return random.choice([x/100. for x in range(100-n, 100+n, 1)])
+        f = 100.
+        n = int(f * self.noise)
+        return random.choice([x/f for x in range(f - n, f + n + 1, 1)])
 
 
